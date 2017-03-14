@@ -35,6 +35,21 @@ function loadColors(context, target) {
 		NSApp.displayDialog("Your plugin out of date. Please update to the latest version of Sketch Palettes.");
 		return;
 	}
+
+	function convertHexToRGBA(hex,opacity){
+	    hex = hex.replace('#','');
+	    r = parseInt(hex.substring(0,2), 16) / 255;
+	    g = parseInt(hex.substring(2,4), 16) / 255;
+	    b = parseInt(hex.substring(4,6), 16) / 255;
+	    a = opacity ? (opacity / 100) : 1;
+
+	    return {
+	    	red: r,
+	    	green: g,
+	    	blue: b,
+	    	alpha: a
+	    };
+	}
 	
 	// Convert colors to MSColors
 	// Check for older hex code palette version
@@ -47,12 +62,22 @@ function loadColors(context, target) {
 		};
 	} else {
 		for (var i = 0; i < palette.length; i++) {
-			colors.push(MSColor.colorWithRed_green_blue_alpha(
-				palette[i].red,
-				palette[i].green,
-				palette[i].blue,
-				palette[i].alpha
-			));	
+			if (palette[i].hex && palette[i].hex.length > 0) {
+				var rgba = convertHexToRGBA(palette[i].hex);
+				colors.push(MSColor.colorWithRed_green_blue_alpha(
+					rgba.red,
+					rgba.green,
+					rgba.blue,
+					rgba.alpha
+				));
+			} else {
+				colors.push(MSColor.colorWithRed_green_blue_alpha(
+					palette[i].red,
+					palette[i].green,
+					palette[i].blue,
+					palette[i].alpha
+				));
+			}
 		};
 	}
 	
